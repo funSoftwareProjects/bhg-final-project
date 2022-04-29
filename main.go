@@ -3,13 +3,16 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"log"
 	"os"
 )
 
 //here is a comment
+//here is another comment
+
 func main() {
-	pull, x := os.Open("getFiles.go")
+	pull, x := os.Open("Silmarillion_Sticker (2).png")
 	if x != nil {
 		log.Fatal(x)
 	}
@@ -26,6 +29,6 @@ func preProcess(dat *os.File) (*bytes.Reader, error) {
 	bufR := bufio.NewReader(dat)
 	_, err = bufR.Read(b)
 	bReader := bytes.NewReader(b)
-
+	fmt.Printf("%x", bReader)
 	return bReader, err
 }
