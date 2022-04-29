@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"log"
 	"os"
 )
@@ -29,6 +28,6 @@ func preProcess(dat *os.File) (*bytes.Reader, error) {
 	bufR := bufio.NewReader(dat)
 	_, err = bufR.Read(b)
 	bReader := bytes.NewReader(b)
-	fmt.Printf("%x", bReader)
+	//fmt.Printf("%x", bReader)
 	return bReader, err
 }
