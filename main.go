@@ -7,8 +7,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	//"github.com/spf13/pflag"
+	//"github.com/blackhat-go/bhg/ch-13/imgInject/Models"
 )
 
+/*
 const (
 	endChunkType = "IEND"
 )
@@ -31,6 +34,12 @@ type MetaChunk struct {
 	Chk    Chunk
 	Offset int64
 }
+*/
+var (
+	//flags = pflag.FlagSet{SortFlags: false}
+	opts models.CmdLineOpts
+	png  pnglib.MetaChunk
+)
 
 func main() {
 	pull, x := os.Open("Silmarillion_Sticker (2).png")
@@ -38,10 +47,15 @@ func main() {
 	if x != nil {
 		log.Fatal(x)
 	}
-	valid, _ := preProcess(pull)
-	if validate(valid) == "correct" {
-		fmt.Println("This is a PNG. Commence steganography")
+	valid, x := preProcess(pull)
+	if x != nil {
+		log.Fatal(x)
 	}
+	png.ProcessImage(valid, &opts)
+	//if mc.validate(valid) == "correct" {
+	//	fmt.Println("This is a PNG. Commence steganography")
+	//}
+	//mc.validate(valid)
 }
 
 func preProcess(dat *os.File) (*bytes.Reader, error) {
@@ -71,7 +85,7 @@ func preProcess(dat *os.File) (*bytes.Reader, error) {
 
 }
 
-func validate(b *bytes.Reader) string {
+func (mc *MetaChunk) validate(b *bytes.Reader) {
 	var header Header
 
 	if err := binary.Read(b, binary.BigEndian, &header.Header); err != nil {
@@ -84,5 +98,5 @@ func validate(b *bytes.Reader) string {
 	if string(bArr[1:4]) != "PNG" {
 		log.Fatal("Provided file is not a valid PNG format")
 	}
-	return "correct"
+	//return "correct"
 }
