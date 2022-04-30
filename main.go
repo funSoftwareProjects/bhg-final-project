@@ -38,8 +38,10 @@ func main() {
 	if x != nil {
 		log.Fatal(x)
 	}
-	jazz, x := preProcess(pull)
-	validate(jazz)
+	valid, _ := preProcess(pull)
+	if validate(valid) == "correct" {
+		fmt.Println("This is a PNG. Commence steganography")
+	}
 }
 
 func preProcess(dat *os.File) (*bytes.Reader, error) {
@@ -69,7 +71,7 @@ func preProcess(dat *os.File) (*bytes.Reader, error) {
 
 }
 
-func validate(b *bytes.Reader) {
+func validate(b *bytes.Reader) string {
 	var header Header
 
 	if err := binary.Read(b, binary.BigEndian, &header.Header); err != nil {
@@ -82,4 +84,5 @@ func validate(b *bytes.Reader) {
 	if string(bArr[1:4]) != "PNG" {
 		log.Fatal("Provided file is not a valid PNG format")
 	}
+	return "correct"
 }
