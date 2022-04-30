@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"bufio"
 )
 
 //usage: go run getFiles.go /
@@ -17,19 +16,13 @@ var regexes = []*regexp.Regexp{
 }
 
 func walkFn(path string, f os.FileInfo, err error) error {
-	f, err := os.Create("/tmp/output")
-	check(err)
-	defer f.Close()
 
 	for _, r := range regexes {
 		if r.MatchString(path) {
-			//fmt.Printf("%s\n", path)
-			n, err := f.WriteString(path)
-			check(err)
-			fmt.Printf("wrote %s", n)
+			fmt.Printf("%s\n", path)
+
 		}
 	}
-	f.Sync()
 	return nil
 }
 
