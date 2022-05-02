@@ -1,6 +1,8 @@
 package main
 
 import (
+	"Users/Will/Desktop/School/COSC/Cyber/stegan/bhg-final-project/models"
+	"Users/Will/Desktop/School/COSC/Cyber/stegan/bhg-final-project/pnglib"
 	"bufio"
 	"bytes"
 	"encoding/binary"
@@ -8,10 +10,8 @@ import (
 	"log"
 	"os"
 	//"github.com/spf13/pflag"
-	//"github.com/blackhat-go/bhg/ch-13/imgInject/Models"
 )
 
-/*
 const (
 	endChunkType = "IEND"
 )
@@ -34,7 +34,7 @@ type MetaChunk struct {
 	Chk    Chunk
 	Offset int64
 }
-*/
+
 var (
 	//flags = pflag.FlagSet{SortFlags: false}
 	opts models.CmdLineOpts
@@ -52,10 +52,11 @@ func main() {
 		log.Fatal(x)
 	}
 	png.ProcessImage(valid, &opts)
-	//if mc.validate(valid) == "correct" {
-	//	fmt.Println("This is a PNG. Commence steganography")
-	//}
+	if validate(valid) == "correct" {
+		fmt.Println("This is a PNG. Commence steganography")
+	}
 	//mc.validate(valid)
+	validate(valid)
 }
 
 func preProcess(dat *os.File) (*bytes.Reader, error) {
@@ -85,7 +86,8 @@ func preProcess(dat *os.File) (*bytes.Reader, error) {
 
 }
 
-func (mc *MetaChunk) validate(b *bytes.Reader) {
+//func (mc *MetaChunk) validate(b *bytes.Reader) {
+func validate(b *bytes.Reader) string {
 	var header Header
 
 	if err := binary.Read(b, binary.BigEndian, &header.Header); err != nil {
@@ -98,5 +100,5 @@ func (mc *MetaChunk) validate(b *bytes.Reader) {
 	if string(bArr[1:4]) != "PNG" {
 		log.Fatal("Provided file is not a valid PNG format")
 	}
-	//return "correct"
+	return "correct"
 }
