@@ -24,21 +24,15 @@ var (
 )
 
 func main() {
-	pull, x := os.Open("images/Silmarillion_Sticker (2).png")
+	pull, x := os.Open("Silmarillion_Sticker (2).png")
 	//pull, x := os.Open("test.txt")
 	if x != nil {
 		log.Fatal(x)
 	}
-	valid, x := preProcess(pull)
-	if x != nil {
-		log.Fatal(x)
-	}
-	png.ProcessImage(valid, &opts)
+	valid, _ := preProcess(pull)
 	if validate(valid) == "correct" {
 		fmt.Println("This is a PNG. Commence steganography")
 	}
-	//mc.validate(valid)
-	//validate(valid)
 }
 
 //func (mc *MetaChunk) validate(b *bytes.Reader) {
