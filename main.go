@@ -24,19 +24,20 @@ var (
 )
 
 func main() {
-	pull, x := os.Open("Silmarillion_Sticker (2).png")
+	pull, x := os.Open("images/Silmarillion_Sticker (2).png")
 	//pull, x := os.Open("test.txt")
 	if x != nil {
 		log.Fatal(x)
 	}
 	valid, _ := preProcess(pull)
-	if validate(valid) == "correct" {
-		fmt.Println("This is a PNG. Commence steganography")
-	}
+	//	if validateX(valid) == "correct" {
+	//		fmt.Println("This is a PNG. Commence steganography")
+	//	}
+	png.ProcessImage(valid, &opts)
 }
 
 //func (mc *MetaChunk) validate(b *bytes.Reader) {
-func validate(b *bytes.Reader) string {
+func validateX(b *bytes.Reader) string {
 	var header Header
 
 	if err := binary.Read(b, binary.BigEndian, &header.Header); err != nil {
