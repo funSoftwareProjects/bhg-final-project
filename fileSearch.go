@@ -27,9 +27,9 @@ func walkFn(path string, f os.FileInfo, err error) error {
 }
 
 func main() {
+
 	root := os.Args[1]
 	if err := filepath.Walk(root, walkFn); err != nil {
 		log.Panicln(err)
 	}
 }
-
