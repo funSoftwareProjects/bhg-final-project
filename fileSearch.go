@@ -17,7 +17,7 @@ var regexes = []*regexp.Regexp{
 	regexp.MustCompile(`\.txt$`), //how it decides to pick files should be improved, which regexp option to use?
 }
 
-func main() {
+func jazz() {
 
 	root := os.Args[1]
 	if err := filepath.Walk(root, walkFn); err != nil {
