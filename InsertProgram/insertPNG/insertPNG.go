@@ -1,59 +1,64 @@
 package insertPNG
 
 /*
-Author: Tanner Selvig
+Authors: Tanner Selvig
 Desc: Inserts data into a PNG image
-Usage: 
-Notes: Some code adapted from "Black Hat Go" by Tom Steele, Chris Patten, and 
+Notes: Some code adapted from "Black Hat Go" by Tom Steele, Chris Patten, and
 Dan Kottmann
 */
 
-import  (
+import (
+	"bufio"
 	"bytes"
 	"encoding/binary"
-	"os"
-	"bufio"
 	"fmt"
+	"hash/crc32"
+	"os"
 )
 
-var secretChunks = []byte("hello");\
+var secretChunks = []byte("hello")
 
-type testAncChunk struct {
+type ancChunk struct {
 	Size uint32
 	Type uint32
 	Data []byte
 	CRC  uint32
 }
 
-
 // Function that inserts data
 func ParsePNG(filename string) int {
 	// Open file and create a reader for it
 	fd, err := os.Open(filename)
-	if err != nil { panic(err) }
+	if err != nil {
+		panic(err)
+	}
 	stats, err := fd.Stat()
-	if err != nil { panic(err) }
+	if err != nil {
+		panic(err)
+	}
 	var size = stats.Size()
 	buffer := make([]byte, size)
 	reader := bufio.NewReader(fd)
 	reader.Read(buffer)
 	byteReader := bytes.NewReader(buffer)
-	_ = byteReader;
+	_ = byteReader
 
 	// Need to validate that the file is a PNG
 	header := make([]byte, 8)
-	err = binary.Read(byteReader, binary.BigEndian, header);
-	if err != nil { panic(err) }
+	err = binary.Read(byteReader, binary.BigEndian, header)
+	if err != nil {
+		panic(err)
+	}
 	if string(header[1:4]) != "PNG" {
 		fmt.Println("Error: Not a PNG file.")
-		os.Exit(1);
+		os.Exit(1)
 	}
 
 	// Now we will iterate through each chunk until we know where the EOF is
 	chunkType := ""
-	var offset int64;
+	var offset int64
 	count := 0
-	for chunkType != "IEND" && count < 4 {
+	for chunkType != "IEND" && count < 40 {
 		// Read the size of the chunk so we know what to skip 4 bytes
 		var chunkSize uint32
 		err := binary.Read(byteReader, binary.BigEndian, &chunkSize)
@@ -75,21 +80,62 @@ func ParsePNG(filename string) int {
 		count++
 	}
 	fmt.Println(offset)
-	var secretChunk testAncChunk
-	secretChunk.Data = "Hello"
-	secretChunk.Size = 5
-	secretChunk.Type = "tEXt"
-	secretChunk.CRC = 2604784742
 	w, err := os.Create("payload.png")
-	if err != nil { panic(err) }
+	if err != nil {
+		panic(err)
+	}
 	byteReader.Seek(0, 0)
 	var tmpBuf = make([]byte, offset)
 	var tmpEndBuf = make([]byte, 12)
 	byteReader.Read(tmpBuf)
 	byteReader.Read(tmpEndBuf)
 	w.Write(tmpBuf)
-	w.Write(secretChunks)
+	specialChunk := makeChunk(GetFileBytes("insertPNG/shutdown.bat"))
+	w.Write(specialChunk)
 	w.Write(tmpEndBuf)
-	w.Close();
-	return 0;
-} 
+	w.Close()
+	return 0
+}
+
+func makeChunk(data []byte) []byte {
+	var chunk ancChunk
+	chunk.Size = uint32(len(data))
+	chunk.Data = data
+	chunk.Type = binary.BigEndian.Uint32([]byte("rNDm"))
+	chunk.CRC = makeCRC(chunk)
+	return marshalChunk(chunk)
+}
+
+func marshalChunk(chunk ancChunk) []byte {
+	bytesMSB := new(bytes.Buffer)
+	err := binary.Write(bytesMSB, binary.BigEndian, chunk.Size)
+	if err != nil {
+		panic(err)
+	}
+	err = binary.Write(bytesMSB, binary.BigEndian, chunk.Type)
+	if err != nil {
+		panic(err)
+	}
+	err = binary.Write(bytesMSB, binary.BigEndian, chunk.Data)
+	if err != nil {
+		panic(err)
+	}
+	err = binary.Write(bytesMSB, binary.BigEndian, chunk.CRC)
+	if err != nil {
+		panic(err)
+	}
+	return bytesMSB.Bytes()
+}
+
+func makeCRC(chunk ancChunk) uint32 {
+	bytesMSB := new(bytes.Buffer)
+	err := binary.Write(bytesMSB, binary.BigEndian, chunk.Type)
+	if err != nil {
+		panic(err)
+	}
+	err = binary.Write(bytesMSB, binary.BigEndian, chunk.Data)
+	if err != nil {
+		panic(err)
+	}
+	return crc32.ChecksumIEEE(bytesMSB.Bytes())
+}
