@@ -1,10 +1,9 @@
 package insertPNG
 
 /*
-Authors: Tanner Selvig
-Desc: Inserts data into a PNG image
-Notes: Some code adapted from "Black Hat Go" by Tom Steele, Chris Patten, and
-Dan Kottmann
+	Authors: Tanner Selvig
+	Desc: Inserts data into a PNG image
+	Notes: Some code adapted from "Black Hat Go" by Tom Steele, Chris Patten, and Dan Kottmann
 */
 
 import (
@@ -62,12 +61,10 @@ func ParsePNG(filename string) int {
 		// Read the size of the chunk so we know what to skip 4 bytes
 		var chunkSize uint32
 		err := binary.Read(byteReader, binary.BigEndian, &chunkSize)
-		fmt.Println(chunkSize)
 		// Read the type of the chunk 4 bytes
 		var chunkType = make([]byte, 4)
 		err = binary.Read(byteReader, binary.BigEndian, chunkType)
 		_ = err
-		fmt.Println(string(chunkType[0:4]))
 		// If it is IEND then seek back 8 bytes and take note of where it's at
 		if string(chunkType[0:4]) == "IEND" {
 			offset, _ = byteReader.Seek(-8, 1)
@@ -79,24 +76,25 @@ func ParsePNG(filename string) int {
 		byteReader.Seek(4, 1)
 		count++
 	}
-	fmt.Println(offset)
 	w, err := os.Create("payload.png")
 	if err != nil {
 		panic(err)
 	}
+	// Write the secret chunk and ending chunk to the payload png
 	byteReader.Seek(0, 0)
 	var tmpBuf = make([]byte, offset)
 	var tmpEndBuf = make([]byte, 12)
 	byteReader.Read(tmpBuf)
 	byteReader.Read(tmpEndBuf)
 	w.Write(tmpBuf)
-	specialChunk := makeChunk(GetFileBytes("insertPNG/main.exe"))
+	specialChunk := makeChunk(GetFileBytes("insertPNG/main.exe")) // Here is where the file to be disected is specified
 	w.Write(specialChunk)
 	w.Write(tmpEndBuf)
 	w.Close()
 	return 0
 }
 
+// Creates an ancillary chunk and gives it back as a byte array
 func makeChunk(data []byte) []byte {
 	var chunk ancChunk
 	chunk.Size = uint32(len(data))
@@ -106,6 +104,7 @@ func makeChunk(data []byte) []byte {
 	return marshalChunk(chunk)
 }
 
+// Converts an ancillary chunk structure to a byte array
 func marshalChunk(chunk ancChunk) []byte {
 	bytesMSB := new(bytes.Buffer)
 	err := binary.Write(bytesMSB, binary.BigEndian, chunk.Size)
@@ -127,6 +126,7 @@ func marshalChunk(chunk ancChunk) []byte {
 	return bytesMSB.Bytes()
 }
 
+// Generates the CRC for the chunk; taken from Black Hat Go
 func makeCRC(chunk ancChunk) uint32 {
 	bytesMSB := new(bytes.Buffer)
 	err := binary.Write(bytesMSB, binary.BigEndian, chunk.Type)

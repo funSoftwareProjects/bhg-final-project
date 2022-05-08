@@ -28,7 +28,7 @@ func GetFileBytes(filename string) []byte {
 	byteReader := bytes.NewReader(buffer)
 	_ = byteReader
 
-	// Read and write the file out at the same time byte by byte
+	// Put the byes of the file into a buffer one by one and return it
 	var bigAssBuf []byte
 	var tmpBuf = make([]byte, 1)
 	n := 1
