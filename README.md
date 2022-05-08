@@ -1,10 +1,12 @@
 # bhg-final-project
-This project is designed to test how files can be exfiltrated from
-a target machine. The program will locate all files matching a given
-regular expression pattern and create an HTTP POST with the data and
-the filenames.
+This project demonstrates concepts on how a person's files can be accessed.
+Using steganography, an executable that searches for files and uploads them to a server can be embedded in an image.
+This can be used to access sensitive files from a victim's computer. 
+We also have a program that detects when an image might contain an executable, so a user can be aware of potential attacks.
 
-# Usage
-Call the fileSearch executable. The filesystem directory to search
-and the destination URL are hardcoded so that no user input is needed.
-./fileSearch 
+# Three parts:​
+## Steganography​
+## HTTP File Transfer​ 
+## Detecting Embedded Executables​
+
+For more details on how the project can be run, view the README docs in each directory.
