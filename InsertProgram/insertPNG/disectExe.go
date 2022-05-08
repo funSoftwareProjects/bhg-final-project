@@ -3,7 +3,6 @@ package insertPNG
 /*
 Authors: Tanner Selvig
 Desc: Takes a file and returns it as a byte array
-Dan Kottmann
 */
 
 import (

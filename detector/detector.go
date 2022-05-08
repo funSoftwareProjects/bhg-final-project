@@ -1,10 +1,14 @@
+/*
+Authors: Tanner Selvig, Will Brant
+Desc: Takes a file and returns it as a byte array
+*/
+
 package main
 
 import (
 	"bufio"
 	"bytes"
 	"encoding/binary"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
@@ -28,7 +32,6 @@ func main() {
 	reader := bufio.NewReader(fd)
 	reader.Read(buffer)
 	byteReader := bytes.NewReader(buffer)
-	_ = byteReader
 
 	// Need to validate that the file is a PNG
 	header := make([]byte, 8)
@@ -42,33 +45,55 @@ func main() {
 	}
 
 	chunkType := ""
-	var offset int64
+	malPNG := false
 	//count := 0
 	//nothing := 0
 	for chunkType != "IEND" { //this check does not appear to work. Runs forever
-		//fmt.Printf("chunk number %d\n", nothing)
-		//nothing++
-		newBuf := string(buffer) //buffer holds the current chunk, right?
-		bs, err := hex.DecodeString(newBuf)
+		var chunkSize uint32
+		err := binary.Read(byteReader, binary.BigEndian, &chunkSize)
+		if err != nil {panic(err)}
+		var chunkType = make([]byte, 4)
+		err = binary.Read(byteReader, binary.BigEndian, chunkType)
+		if err != nil {panic(err)}
+		if string(chunkType[0:4]) == "IEND" {
+			break
+		}
+		firstDataBuf := make([]byte, 2)
+		err = binary.Read(byteReader, binary.BigEndian, firstDataBuf)
+		byteReader.Seek(int64(chunkSize) - 2, 1)
+		byteReader.Seek(4, 1)
+		
 		//^this decodes the string. Are there header bytes in need to ignore
 		if err != nil {
-			//panic(err)
+			panic(err)
 			//fmt.Println("not a prob")
 		} else {
 			//fmt.Println(string(bs))
-			valid := validate(string(bs))
-			if valid == false {
-				fmt.Println("this is a payload")
-			} else {
-				fmt.Println("This png is safe")
+			if(!validateBytes(firstDataBuf)) {
+				malPNG = true
+				break;
 			}
-
+			
 		}
 		//fmt.Println(string(bs))
-
+		
 	}
-	fmt.Println(offset)
+	if malPNG == true {
+		fmt.Println("this is a payload")
+	} else {
+		fmt.Println("This png is safe")
+	}
+}
 
+func validateBytes(firstBytes []byte) bool {
+	// fmt.Printf("First byte: %c, Second: %c\n", firstBytes[0], firstBytes[1])
+	// There is a chance that we will get false positives when we use this method but there
+	// is really no other good way to identify an executable file
+	if firstBytes[0] == 'M' && firstBytes[1] == 'Z' { // Executable files start with MZ in their header
+		// fmt.Printf("Made it inside\n")
+		return false
+	}
+	return true
 }
 
 func validate(sample string) bool {
