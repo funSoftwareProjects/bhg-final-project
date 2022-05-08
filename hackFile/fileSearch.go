@@ -10,6 +10,7 @@ import (
 	"regexp"
 )
 
+//Authors: Aram Maljanian
 //usage: go run getFiles.go /
 //Windows usage: .\fileSearch.exe C:\Users\
 
